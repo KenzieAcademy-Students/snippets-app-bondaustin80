@@ -16,6 +16,7 @@ import { LikeIcon, LikeIconFill, ReplyIcon, TrashIcon } from 'components'
 import './Post.scss'
 import { toast } from 'react-toastify'
 import { LinkContainer } from 'react-router-bootstrap'
+import { Modal } from 'react-bootstrap'
 
 const initialState = {
   commentText: '',
@@ -25,7 +26,9 @@ const initialState = {
 export default function Post({
   post: { _id, author, profile_image, text, comments, created, likes },
   detail,
-  userDetail
+  userDetail,
+  deleted,
+  setDeleted
 }) {
   const [data, setData] = useState(initialState)
   const [validated, setValidated] = useState(false)
@@ -36,12 +39,15 @@ export default function Post({
   } = useProvideAuth()
   const [likedState, setLiked] = useState(likes.includes(user.uid))
   const [likesState, setLikes] = useState(likes.length)
+  const [show, setShow] = useState(false);
   const handleInputChange = (event) => {
     setData({
       ...data,
       [event.target.name]: event.target.value,
     })
   }
+  const handleClose = () => setShow(false)
+  const handleShow = () => setShow(true)
 
   const handleToggleLike = async () => {
     if (!likedState) {
@@ -69,6 +75,15 @@ export default function Post({
   // with delete request
   const handleDeletePost = async () => {
     console.log('Delete post', _id)
+    try {
+      axios.delete(`posts/${_id}`)
+      toast("Post Deleted")
+    } catch (error) {
+      console.log(error)
+    }
+    setDeleted(true)
+    setShow(false)
+
   }
 
   const handleCommentSubmit = async (event) => {
@@ -107,10 +122,26 @@ export default function Post({
 
   useEffect(() => {
     setStateComments(comments)
-  }, [comments])
+    setDeleted(false)
+  }, [comments, deleted])
 
   return (
-    <>
+    <div>
+      <Modal show={show}>
+      <Modal.Header  closeButton>
+        <Modal.Title>Are you sure you want to delete it?</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Footer>
+        <Button onClick={handleDeletePost}>
+          Delete
+        </Button>
+        <Button onClick={handleClose}>
+          Cancel
+        </Button>
+      </Modal.Footer>
+      </Modal>
+
       <ListGroup.Item
         className='bg-white text-danger px-3 rounded-edge'
         as={'div'}
@@ -145,7 +176,7 @@ export default function Post({
               <div className='d-flex align-items-center'>
                 {user.username === author.username && (
                   <Container className='close'>
-                    <TrashIcon onClick={handleDeletePost} />
+                    <TrashIcon onClick={handleShow} />
                   </Container>
                 )}
               </div>
@@ -223,6 +254,6 @@ export default function Post({
           )}
         </div>
       )}
-    </>
+    </div>
   )
 }

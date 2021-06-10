@@ -19,6 +19,7 @@ export default function Feed() {
   const [posts, setPosts] = useState(null)
   const [postLoading, setPostLoading] = useState(true)
   const [postError, setPostError] = useState(false)
+  const [deleted, setDeleted] = useState(false)
 
   const [data, setData] = useState(initialState)
   const [validated, setValidated] = useState(false)
@@ -88,7 +89,7 @@ export default function Feed() {
       }
     }
     getPosts()
-  }, [])
+  }, [deleted])
 
   return (
     <>
@@ -132,7 +133,7 @@ export default function Feed() {
           <h6>Recent Snips</h6>
           {postError && 'Error fetching posts'}
           {posts &&
-            posts.map((post) => <Post key={post._id} post={post} />)}
+            posts.map((post) => <Post key={post._id} post={post} deleted={deleted} setDeleted={setDeleted}/>)}
         </Container>
       ) : (
         <LoadingSpinner full />
