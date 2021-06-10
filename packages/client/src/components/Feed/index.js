@@ -20,7 +20,7 @@ export default function Feed() {
   const [postLoading, setPostLoading] = useState(true)
   const [postError, setPostError] = useState(false)
   const [deleted, setDeleted] = useState(false)
-
+  const [filter, setFilter] = useState()
   const [data, setData] = useState(initialState)
   const [validated, setValidated] = useState(false)
 
@@ -76,12 +76,24 @@ export default function Feed() {
       )
   }
 
+  const handleFilter = (list) => {
+    let filteredList = []
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].text.toLowerCase().includes(document.getElementById("search").value.toLowerCase())) {
+        filteredList.push(list[i])
+      }
+    }
+    console.log(filteredList)
+    return filteredList
+  }
+
   useEffect(() => {
     const getPosts = async () => {
       try {
         const allPosts = await axios.get('posts')
-        setPosts(allPosts.data)
+        setPosts(handleFilter(allPosts.data))
         setPostLoading(false)
+        console.log(posts)
       } catch (err) {
         console.error(err.message)
         setPostLoading(false)
@@ -89,7 +101,7 @@ export default function Feed() {
       }
     }
     getPosts()
-  }, [deleted])
+  }, [deleted, posts]);
 
   return (
     <>
@@ -124,6 +136,10 @@ export default function Feed() {
             {data.isSubmitting ? <LoadingSpinner /> : 'Post'}
           </Button>
         </Form>
+      </Container>
+
+      <Container className='pt-3 pb-3 clearfix'>
+        <input type="text" id="search" placeholder="Search" onChange={handleFilter}></input>
       </Container>
 
       {!postLoading ? (
