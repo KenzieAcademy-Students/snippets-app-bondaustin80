@@ -81,7 +81,6 @@ export default function Post({
     } catch (error) {
       console.log(error)
     }
-    setDeleted(true)
     setShow(false)
 
   }
@@ -122,8 +121,7 @@ export default function Post({
 
   useEffect(() => {
     setStateComments(comments)
-    setDeleted(false)
-  }, [comments, deleted])
+  }, [comments])
 
   return (
     <div>

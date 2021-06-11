@@ -11,6 +11,7 @@ import { LoadingSpinner, Post } from 'components'
 import { useProvideAuth } from 'hooks/useAuth'
 import { useRequireAuth } from 'hooks/useRequireAuth'
 import axios from 'utils/axiosConfig.js'
+import { toast } from 'react-toastify'
 
 export default function UserDetailPage({
   match: {
@@ -73,8 +74,16 @@ export default function UserDetailPage({
         user: { uid, username },
       } = state
       console.log(data.password, uid, username)
+      axios.put(`users/${uid}`, {password: data.password})
+      toast("Password changed")
       setValidated(false)
       // don't forget to update loading state and alert success
+      setLoading(false)
+      setData({
+        ...data,
+        isSubmitting: false,
+        errorMessage: null,
+      })
     } catch (error) {
       setData({
         ...data,
