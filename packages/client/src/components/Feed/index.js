@@ -21,6 +21,7 @@ export default function Feed() {
   const [postError, setPostError] = useState(false)
   const [deleted, setDeleted] = useState(false)
   const [filter, setFilter] = useState()
+  const [search, setSearch] = useState()
   const [data, setData] = useState(initialState)
   const [validated, setValidated] = useState(false)
 
@@ -77,9 +78,10 @@ export default function Feed() {
   }
 
   const handleFilter = (list) => {
+    setSearch(document.getElementById("search").value)
     let filteredList = []
     for (let i = 0; i < list.length; i++) {
-      if (list[i].text.toLowerCase().includes(document.getElementById("search").value.toLowerCase())) {
+      if (list[i].text.toLowerCase().includes(search.toLowerCase())) {
         filteredList.push(list[i])
       }
     }
@@ -102,7 +104,7 @@ export default function Feed() {
       }
     }
     getPosts()
-  }, [deleted, posts]);
+  }, [deleted, search]);
 
   return (
     <>
