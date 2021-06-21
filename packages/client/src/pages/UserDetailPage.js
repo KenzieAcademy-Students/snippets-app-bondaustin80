@@ -12,6 +12,7 @@ import { useProvideAuth } from 'hooks/useAuth'
 import { useRequireAuth } from 'hooks/useRequireAuth'
 import axios from 'utils/axiosConfig.js'
 import { toast } from 'react-toastify'
+import AvatarPicker from 'components/AvatarPicker/AvatarPicker'
 
 export default function UserDetailPage({
   match: {
@@ -21,6 +22,7 @@ export default function UserDetailPage({
 }) {
   const { state } = useProvideAuth()
   const [user, setUser] = useState()
+  const [profileImage, setProfileImage] = useState()
   const [loading, setLoading] = useState(true)
   const [validated, setValidated] = useState(false)
   const [open, setOpen] = useState(false)
@@ -73,8 +75,8 @@ export default function UserDetailPage({
       const {
         user: { uid, username },
       } = state
-      console.log(data.password, uid, username)
-      axios.put(`users/${uid}`, {password: data.password})
+      console.log(data.password, profileImage, uid, username)
+      axios.put(`users/${uid}`, {password: data.password, profile_image: profileImage})
       toast("Password changed")
       setValidated(false)
       // don't forget to update loading state and alert success
@@ -154,6 +156,8 @@ export default function UserDetailPage({
                         Must be 8-20 characters long.
                       </Form.Text>
                     </Form.Group>
+
+                    <AvatarPicker pickAvatar={(avatar) => setProfileImage(avatar)}></AvatarPicker>
 
                     {data.errorMessage && (
                       <span className='form-error'>{data.errorMessage}</span>

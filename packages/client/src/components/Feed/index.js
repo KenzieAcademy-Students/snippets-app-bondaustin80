@@ -93,10 +93,8 @@ export default function Feed() {
     const getPosts = async () => {
       try {
         const allPosts = await axios.get('posts')
-        setPosts(allPosts.data)
+        setPosts(handleFilter(allPosts.data))
         setPostLoading(false)
-        console.log(posts)
-        setFilter(handleFilter(posts))
       } catch (err) {
         console.error(err.message)
         setPostLoading(false)
@@ -151,8 +149,8 @@ export default function Feed() {
         >
           <h6>Recent Snips</h6>
           {postError && 'Error fetching posts'}
-          {filter &&
-            filter.map((post) => <Post key={post._id} post={post} deleted={deleted} setDeleted={setDeleted}/>)}
+          {posts &&
+            posts.map((post) => <Post key={post._id} post={post} deleted={deleted} setDeleted={setDeleted}/>)}
         </Container>
       ) : (
         <LoadingSpinner full />
