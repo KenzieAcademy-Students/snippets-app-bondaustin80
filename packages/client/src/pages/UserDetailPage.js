@@ -128,6 +128,7 @@ export default function UserDetailPage({
             />
           </Figure>
           <Card.Title>{uid}</Card.Title>
+          <div>Email: {user.email}</div>
           {state.user.username === uid && (
             <div onClick={() => setOpen(!open)} style={{cursor: 'pointer', color: '#BFBFBF'}}>Edit Password</div>
           )}

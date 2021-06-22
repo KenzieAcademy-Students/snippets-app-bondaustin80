@@ -15,6 +15,7 @@ import AvatarPicker from 'components/AvatarPicker/AvatarPicker'
 
 const initialState = {
   username: '',
+  email: '',
   password: '',
   isSubmitting: false,
   errorMessage: null,
@@ -48,10 +49,10 @@ export default function RegisterPage() {
       ...data,
       [event.target.name]: event.target.value,
     })
+    console.log(data)
   }
 
   const handleSignup = async (event) => {
-    console.log(profileImage)
     const form = event.currentTarget
     event.preventDefault()
     event.stopPropagation()
@@ -66,7 +67,7 @@ export default function RegisterPage() {
     })
     setProfileImage(getRandomProfileUrl())
     try {
-      const res = await auth.signup(data.username, data.password, profileImage)
+      const res = await auth.signup(data.username, data.email, data.password, profileImage)
       setData({
         ...data,
         isSubmitting: false,
@@ -111,6 +112,17 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                     />
                 </InputGroup>
+                </Form.Group>
+                <Form.Group>
+                <Form.Label htmlFor='Register'>Email</Form.Label>
+                <Form.Control
+                    type='text'
+                    name='email'
+                    required
+                    id="inputEmailRegister"
+                    value={data.email}
+                    onChange={handleInputChange}
+                />
                 </Form.Group>
                 <Form.Group>
                 <Form.Label htmlFor='Register'>Password</Form.Label>

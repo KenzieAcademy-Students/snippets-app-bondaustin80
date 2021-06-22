@@ -11,7 +11,8 @@ router.route('/').get((req, res, next) => {
 })
 
 router.post('/signup', async (req, res) => {
-  const { username, password, profile_image } = req.body
+  const { username, password, profile_image, email } = req.body
+  console.log(req.body)
 
   if (!password || !username) {
     return res.status(422).json({ error: 'please add all the fields' })
@@ -28,6 +29,7 @@ router.post('/signup', async (req, res) => {
         const user = new User({
           username,
           passwordHash: hashedpassword,
+          email: req.body.email,
           profile_image: profile_image,
         })
 
