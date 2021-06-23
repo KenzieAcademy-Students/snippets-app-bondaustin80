@@ -76,21 +76,28 @@ export default function UserDetailPage({
         user: { uid, username },
       } = state
       console.log(data.password, profileImage, uid, username)
-      axios.put(`users/${uid}`, {password: data.password, profile_image: profileImage})
-      toast("Password changed")
-      setValidated(false)
-      // don't forget to update loading state and alert success
-      setLoading(false)
-      setData({
-        ...data,
-        isSubmitting: false,
-        errorMessage: null,
-      })
+      let currentPassword = document.getElementById("currentPassword").value
+      let confirmPassword = document.getElementById("confirmPassword").value
+      if (!(currentPassword === confirmPassword)) {
+        toast("Passwords do not match")
+      } else {
+        let change = await axios.put(`users/${uid}`, {password: data.password, current_password: currentPassword, profile_image: profileImage})
+        toast("Password Changed")
+        setValidated(false)
+        // don't forget to update loading state and alert success
+        setLoading(false)
+        setData({
+          ...data,
+          isSubmitting: false,
+          errorMessage: null,
+        })
+      }
     } catch (error) {
+      toast.error(error.response.data.message)
       setData({
         ...data,
         isSubmitting: false,
-        errorMessage: error.message,
+        //errorMessage: error.message,
       })
     }
   }
@@ -141,6 +148,24 @@ export default function UserDetailPage({
                     validated={validated}
                     onSubmit={handleUpdatePassword}
                   >
+                    <Form.Group>
+                      <Form.Label htmlFor='password'>Current Password</Form.Label>
+                      <Form.Control
+                        type='password'
+                        name='password'
+                        id="currentPassword"
+                        required
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label htmlFor='password'>Confirm Password</Form.Label>
+                      <Form.Control
+                        type='password'
+                        name='password'
+                        id="confirmPassword"
+                        required
+                      />
+                    </Form.Group>
                     <Form.Group>
                       <Form.Label htmlFor='password'>New Password</Form.Label>
                       <Form.Control
