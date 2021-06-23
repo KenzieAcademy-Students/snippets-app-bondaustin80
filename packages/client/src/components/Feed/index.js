@@ -19,7 +19,9 @@ export default function Feed() {
   const [posts, setPosts] = useState(null)
   const [postLoading, setPostLoading] = useState(true)
   const [postError, setPostError] = useState(false)
-
+  const [deleted, setDeleted] = useState(false)
+  const [filter, setFilter] = useState()
+  const [search, setSearch] = useState()
   const [data, setData] = useState(initialState)
   const [validated, setValidated] = useState(false)
 
@@ -75,11 +77,23 @@ export default function Feed() {
       )
   }
 
+  const handleFilter = (list) => {
+    setSearch(document.getElementById("search").value)
+    let filteredList = []
+    for (let i = 0; i < list.length; i++) {
+      if (list[i].text.toLowerCase().includes(search.toLowerCase())) {
+        filteredList.push(list[i])
+      }
+    }
+    console.log(filteredList)
+    return filteredList
+  }
+
   useEffect(() => {
     const getPosts = async () => {
       try {
         const allPosts = await axios.get('posts')
-        setPosts(allPosts.data)
+        setPosts(handleFilter(allPosts.data))
         setPostLoading(false)
       } catch (err) {
         console.error(err.message)
@@ -88,7 +102,7 @@ export default function Feed() {
       }
     }
     getPosts()
-  }, [])
+  }, [deleted, search]);
 
   return (
     <>
@@ -125,6 +139,10 @@ export default function Feed() {
         </Form>
       </Container>
 
+      <Container className='pt-3 pb-3 clearfix'>
+        <input type="text" id="search" placeholder="Search" onChange={handleFilter}></input>
+      </Container>
+
       {!postLoading ? (
         <Container
           className='pt-3 pb-3'
@@ -132,7 +150,7 @@ export default function Feed() {
           <h6>Recent Snips</h6>
           {postError && 'Error fetching posts'}
           {posts &&
-            posts.map((post) => <Post key={post._id} post={post} />)}
+            posts.map((post) => <Post key={post._id} post={post} deleted={deleted} setDeleted={setDeleted}/>)}
         </Container>
       ) : (
         <LoadingSpinner full />

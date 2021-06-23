@@ -11,10 +11,15 @@ router.route('/').get((req, res, next) => {
 })
 
 router.post('/signup', async (req, res) => {
-  const { username, password, profile_image } = req.body
+  const { username, password, profile_image, email } = req.body
+  console.log(password.length)
 
   if (!password || !username) {
     return res.status(422).json({ error: 'please add all the fields' })
+  }
+
+  if (password.length < 8 || password.length > 20) {
+    return res.status(400).json({ error: "Password length must be between 8 and 20 characters"})
   }
 
   User.findOne({ username: username })
@@ -28,6 +33,7 @@ router.post('/signup', async (req, res) => {
         const user = new User({
           username,
           passwordHash: hashedpassword,
+          email,
           profile_image: profile_image,
         })
 

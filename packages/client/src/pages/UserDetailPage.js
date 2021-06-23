@@ -11,6 +11,8 @@ import { LoadingSpinner, Post } from 'components'
 import { useProvideAuth } from 'hooks/useAuth'
 import { useRequireAuth } from 'hooks/useRequireAuth'
 import axios from 'utils/axiosConfig.js'
+import { toast } from 'react-toastify'
+import AvatarPicker from 'components/AvatarPicker/AvatarPicker'
 
 export default function UserDetailPage({
   match: {
@@ -20,6 +22,7 @@ export default function UserDetailPage({
 }) {
   const { state } = useProvideAuth()
   const [user, setUser] = useState()
+  const [profileImage, setProfileImage] = useState()
   const [loading, setLoading] = useState(true)
   const [validated, setValidated] = useState(false)
   const [open, setOpen] = useState(false)
@@ -72,14 +75,29 @@ export default function UserDetailPage({
       const {
         user: { uid, username },
       } = state
-      console.log(data.password, uid, username)
-      setValidated(false)
-      // don't forget to update loading state and alert success
+      console.log(data.password, profileImage, uid, username)
+      let currentPassword = document.getElementById("currentPassword").value
+      let confirmPassword = document.getElementById("confirmPassword").value
+      if (!(currentPassword === confirmPassword)) {
+        toast("Passwords do not match")
+      } else {
+        let change = await axios.put(`users/${uid}`, {password: data.password, current_password: currentPassword, profile_image: profileImage})
+        toast("Password Changed")
+        setValidated(false)
+        // don't forget to update loading state and alert success
+        setLoading(false)
+        setData({
+          ...data,
+          isSubmitting: false,
+          errorMessage: null,
+        })
+      }
     } catch (error) {
+      toast.error(error.response.data.message)
       setData({
         ...data,
         isSubmitting: false,
-        errorMessage: error.message,
+        //errorMessage: error.message,
       })
     }
   }
@@ -117,6 +135,7 @@ export default function UserDetailPage({
             />
           </Figure>
           <Card.Title>{uid}</Card.Title>
+          <div>Email: {user.email}</div>
           {state.user.username === uid && (
             <div onClick={() => setOpen(!open)} style={{cursor: 'pointer', color: '#BFBFBF'}}>Edit Password</div>
           )}
@@ -129,6 +148,24 @@ export default function UserDetailPage({
                     validated={validated}
                     onSubmit={handleUpdatePassword}
                   >
+                    <Form.Group>
+                      <Form.Label htmlFor='password'>Current Password</Form.Label>
+                      <Form.Control
+                        type='password'
+                        name='password'
+                        id="currentPassword"
+                        required
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label htmlFor='password'>Confirm Password</Form.Label>
+                      <Form.Control
+                        type='password'
+                        name='password'
+                        id="confirmPassword"
+                        required
+                      />
+                    </Form.Group>
                     <Form.Group>
                       <Form.Label htmlFor='password'>New Password</Form.Label>
                       <Form.Control
@@ -145,6 +182,8 @@ export default function UserDetailPage({
                         Must be 8-20 characters long.
                       </Form.Text>
                     </Form.Group>
+
+                    <AvatarPicker pickAvatar={(avatar) => setProfileImage(avatar)}></AvatarPicker>
 
                     {data.errorMessage && (
                       <span className='form-error'>{data.errorMessage}</span>

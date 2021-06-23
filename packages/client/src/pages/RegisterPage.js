@@ -11,9 +11,12 @@ import useRouter from 'hooks/useRouter'
 import { useProvideAuth } from 'hooks/useAuth'
 import { LandingHeader, LoadingSpinner } from 'components'
 import { setAuthToken } from 'utils/axiosConfig'
+import AvatarPicker from 'components/AvatarPicker/AvatarPicker'
+import { toast } from 'react-toastify'
 
 const initialState = {
   username: '',
+  email: '',
   password: '',
   isSubmitting: false,
   errorMessage: null,
@@ -47,6 +50,7 @@ export default function RegisterPage() {
       ...data,
       [event.target.name]: event.target.value,
     })
+    console.log(data)
   }
 
   const handleSignup = async (event) => {
@@ -57,27 +61,32 @@ export default function RegisterPage() {
     if (form.checkValidity() === false) {
     }
 
-    setData({
-      ...data,
-      isSubmitting: true,
-      errorMessage: null,
-    })
-    setProfileImage(getRandomProfileUrl())
-    try {
-      const res = await auth.signup(data.username, data.password, profileImage)
+    if (!(data.password === document.getElementById("confirmPassword").value)) {
+      toast("Passwords do not match")
+    } else {
       setData({
         ...data,
-        isSubmitting: false,
+        isSubmitting: true,
         errorMessage: null,
       })
-      setAuthToken(res.token)
-      router.push('/')
-    } catch (error) {
-      setData({
-        ...data,
-        isSubmitting: false,
-        errorMessage: error ? error.message || error.statusText : null,
-      })
+      setProfileImage(getRandomProfileUrl())
+      try {
+        const res = await auth.signup(data.username, data.email, data.password, profileImage)
+        setData({
+          ...data,
+          isSubmitting: false,
+          errorMessage: null,
+        })
+        setAuthToken(res.token)
+        router.push('/')
+      } catch (error) {
+        toast.error(error.message)
+        setData({
+          ...data,
+          isSubmitting: false,
+          errorMessage: error ? error.message || error.statusText : null,
+        })
+      }
     }
   }
 
@@ -111,6 +120,17 @@ export default function RegisterPage() {
                 </InputGroup>
                 </Form.Group>
                 <Form.Group>
+                <Form.Label htmlFor='Register'>Email</Form.Label>
+                <Form.Control
+                    type='text'
+                    name='email'
+                    required
+                    id="inputEmailRegister"
+                    value={data.email}
+                    onChange={handleInputChange}
+                />
+                </Form.Group>
+                <Form.Group>
                 <Form.Label htmlFor='Register'>Password</Form.Label>
                 <Form.Control
                     type='password'
@@ -121,6 +141,16 @@ export default function RegisterPage() {
                     onChange={handleInputChange}
                 />
                 </Form.Group>
+                <Form.Group>
+                <Form.Label htmlFor='Register'>Confirm Password</Form.Label>
+                <Form.Control
+                    type='password'
+                    name='password'
+                    required
+                    id='confirmPassword'
+                />
+                </Form.Group>
+                <AvatarPicker pickAvatar={(avatar) => setProfileImage(avatar)}></AvatarPicker>
                 {data.errorMessage && (
                 <span className='form-error text-warning'>{data.errorMessage}</span>
                 )}

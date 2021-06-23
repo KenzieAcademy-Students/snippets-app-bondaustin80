@@ -15,6 +15,8 @@ import { timeSince } from 'utils/timeSince'
 import { LikeIcon, LikeIconFill, ReplyIcon, TrashIcon } from 'components'
 import './Post.scss'
 import { toast } from 'react-toastify'
+import { LinkContainer } from 'react-router-bootstrap'
+import { Modal } from 'react-bootstrap'
 
 const initialState = {
   commentText: '',
@@ -24,7 +26,9 @@ const initialState = {
 export default function Post({
   post: { _id, author, profile_image, text, comments, created, likes },
   detail,
-  userDetail
+  userDetail,
+  deleted,
+  setDeleted
 }) {
   const [data, setData] = useState(initialState)
   const [validated, setValidated] = useState(false)
@@ -35,12 +39,15 @@ export default function Post({
   } = useProvideAuth()
   const [likedState, setLiked] = useState(likes.includes(user.uid))
   const [likesState, setLikes] = useState(likes.length)
+  const [show, setShow] = useState(false);
   const handleInputChange = (event) => {
     setData({
       ...data,
       [event.target.name]: event.target.value,
     })
   }
+  const handleClose = () => setShow(false)
+  const handleShow = () => setShow(true)
 
   const handleToggleLike = async () => {
     if (!likedState) {
@@ -68,6 +75,14 @@ export default function Post({
   // with delete request
   const handleDeletePost = async () => {
     console.log('Delete post', _id)
+    try {
+      axios.delete(`posts/${_id}`)
+      toast("Post Deleted")
+    } catch (error) {
+      console.log(error)
+    }
+    setShow(false)
+
   }
 
   const handleCommentSubmit = async (event) => {
@@ -109,7 +124,22 @@ export default function Post({
   }, [comments])
 
   return (
-    <>
+    <div>
+      <Modal show={show}>
+      <Modal.Header  closeButton>
+        <Modal.Title>Are you sure you want to delete it?</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Footer>
+        <Button onClick={handleDeletePost}>
+          Delete
+        </Button>
+        <Button onClick={handleClose}>
+          Cancel
+        </Button>
+      </Modal.Footer>
+      </Modal>
+
       <ListGroup.Item
         className='bg-white text-danger px-3 rounded-edge'
         as={'div'}
@@ -120,11 +150,15 @@ export default function Post({
             className='mr-4 bg-border-color rounded-circle overflow-hidden ml-2 p-1'
             style={{ height: '50px', width: '50px', marginTop: '0px'}}
           >
-            <Figure.Image src={author.profile_image} className='w-100 h-100' />
+            <Link to={`/u/${author.username}`}>
+              <Figure.Image src={author.profile_image} className='w-100 h-100' />
+            </Link>
           </Figure>
           <Media.Body className='w-50'>
             <div className='row d-flex align-items-center'>
-              <span className='text-muted mr-1 username'>@{author.username}</span>
+              <Link to={`/u/${author.username}`}>
+                <span className='text-muted mr-1 username'>@{author.username}</span>
+              </Link>
               <pre className='m-0 text-muted'>{' - '}</pre>
               <span className='text-muted'>{timeSince(created)} ago</span>
             </div>
@@ -140,7 +174,7 @@ export default function Post({
               <div className='d-flex align-items-center'>
                 {user.username === author.username && (
                   <Container className='close'>
-                    <TrashIcon onClick={handleDeletePost} />
+                    <TrashIcon onClick={handleShow} />
                   </Container>
                 )}
               </div>
@@ -218,6 +252,6 @@ export default function Post({
           )}
         </div>
       )}
-    </>
+    </div>
   )
 }
