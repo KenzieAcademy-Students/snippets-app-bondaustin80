@@ -3,6 +3,7 @@ import authRouter from './auth'
 import userRouter from './users'
 import postRouter from './posts'
 import activityRouter from './activity'
+import katasRouter from './katas'
 
 const router = express.Router()
 
@@ -14,5 +15,6 @@ router.use('/auth', authRouter)
 router.use('/users', userRouter)
 router.use('/posts', postRouter)
 router.use('/activity', activityRouter)
+router.use('/katas', katasRouter)
 
 module.exports = router
