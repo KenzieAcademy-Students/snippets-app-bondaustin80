@@ -17,6 +17,9 @@ import './Post.scss'
 import { toast } from 'react-toastify'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Modal } from 'react-bootstrap'
+import Overlay from 'react-bootstrap/Overlay'
+import { OverlayTrigger } from 'react-bootstrap'
+import Tooltip from 'react-bootstrap/Tooltip'
 
 const initialState = {
   commentText: '',
@@ -40,6 +43,7 @@ export default function Post({
   const [likedState, setLiked] = useState(likes.includes(user.uid))
   const [likesState, setLikes] = useState(likes.length)
   const [show, setShow] = useState(false);
+  const [allLikes, setAllLikes] = useState([])
   const handleInputChange = (event) => {
     setData({
       ...data,
@@ -121,6 +125,11 @@ export default function Post({
 
   useEffect(() => {
     setStateComments(comments)
+    let likeArray = []
+    for (let i = 0; i < likes.length; i++) {
+      likeArray.push(likes[i].username)
+    }
+    setAllLikes(likeArray)
   }, [comments])
 
   return (
@@ -194,9 +203,17 @@ export default function Post({
                   likedState ? 'isLiked' : ''
                 }`}
               >
-                <Button variant='link' size='md' onClick={handleToggleLike}>
-                  {likedState ? <LikeIconFill /> : <LikeIcon />}
-                </Button>
+                <OverlayTrigger 
+                placement = "top"
+                overlay={
+                  <Tooltip id="button-tooltip">
+                    {allLikes.join(', ')}
+                  </Tooltip>
+                }>
+                  <Button variant='link' size='md' onClick={handleToggleLike}>
+                    {likedState ? <LikeIconFill /> : <LikeIcon />}
+                  </Button>
+                </OverlayTrigger>
                 <span>{likesState}</span>
               </div>
             </div>
