@@ -1,4 +1,5 @@
 import axios from "axios"
+import FileUploader from "components/FileUploader"
 
 
 function AvatarPicker(props) {
@@ -29,6 +30,7 @@ function AvatarPicker(props) {
     return (
         <div>
             {avatars.map((avatar) => <img className="avatar" id={avatars.indexOf(avatar)} key={avatar} src={avatar} height="100px" onClick={selectAvatar}/>)}
+            <FileUploader/>
         </div>
     )
 }

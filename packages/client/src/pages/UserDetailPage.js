@@ -13,6 +13,7 @@ import { useRequireAuth } from 'hooks/useRequireAuth'
 import axios from 'utils/axiosConfig.js'
 import { toast } from 'react-toastify'
 import AvatarPicker from 'components/AvatarPicker/AvatarPicker'
+import FileUploader from 'components/FileUploader'
 
 export default function UserDetailPage({
   match: {
