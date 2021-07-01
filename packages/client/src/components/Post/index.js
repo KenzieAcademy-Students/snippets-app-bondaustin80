@@ -52,6 +52,7 @@ export default function Post({
   }
   const handleClose = () => setShow(false)
   const handleShow = () => setShow(true)
+  const date = new Date()
 
   const handleToggleLike = async () => {
     if (!likedState) {
@@ -110,6 +111,7 @@ export default function Post({
         text: data.commentText,
         userId: user.uid,
         postId: _id,
+        created: date,
       })
       .then(
         ({ data }) => {
@@ -125,6 +127,7 @@ export default function Post({
 
   useEffect(() => {
     setStateComments(comments)
+    console.log(stateComments)
     let likeArray = []
     for (let i = 0; i < likes.length; i++) {
       likeArray.push(likes[i].username)
@@ -262,6 +265,7 @@ export default function Post({
                       style={{height: '40px', width: '40px'}}
                     />
                   </Figure>
+                  <p>{timeSince(c.created)}</p>
                   <span>{c.text}</span>
                 </div>
               ))}

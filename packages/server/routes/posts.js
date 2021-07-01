@@ -120,11 +120,13 @@ router.all('/like/:postId', requireAuth, async (request, response) => {
 })
 
 router.put('/comments', async (request, response, next) => {
-  const { text, userId, postId } = request.body
+  const { text, userId, postId, created } = request.body
   const comment = {
     text: text,
     author: userId,
+    created: created
   }
+  console.log(comment.created)
   const populateQuery = [
     { path: 'comments.author', select: ['username', 'profile_image'] },
   ]
